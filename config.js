@@ -42,4 +42,7 @@ function reloadPresence(client) {
     presenceIndex = (presenceIndex + 1) % presences.length;
 }
 
+// Automatically update presence every 2 hours
+setInterval(() => reloadPresence(client), 2 * 60 * 60 * 1000);
+
 module.exports = reloadPresence;
