@@ -6,32 +6,35 @@ keepAlive();
 
 // Array of tokens for multiple accounts
 const tokens = [
-  process.env.TOKEN,
-  // Add more tokens as needed
+    process.env.TOKEN,
+    // Add more tokens as needed
 ];
 
 async function loginAccount(token, index) {
-  if (!token) {
-    console.error(`Add a token for account ${index + 1} inside Secrets.`);
-    return;
-  }
+    if (!token) {
+        console.error(`Add a token for account ${index + 1} inside Secrets.`);
+        return;
+    }
 
-  const client = new Client({ checkUpdate: false });
+    const client = new Client({ checkUpdate: false });
 
-  try {
-    await client.login(token);
-    console.clear();
-    console.log(`Logged in as ${client.user.tag} for account ${index + 1}`);
-    global.startTime = new Date();
-    reloadPresence(client);
-  } catch (err) {
-    console.error(`Failed to log in with token ${index + 1}:`, err.message);
-  }
+    try {
+        await client.login(token);
+        console.clear();
+        console.log(`Logged in as ${client.user.tag} for account ${index + 1}`);
+        global.startTime = new Date();
+        await reloadPresence(client);
+
+        // Set interval to update presence every 2 hours
+        setInterval(() => reloadPresence(client), 2 * 60 * 60 * 1000);
+    } catch (err) {
+        console.error(`Failed to log in with token ${index + 1}:`, err.message);
+    }
 }
 
 (async function loginAccounts() {
-  for (let i = 0; i < tokens.length; i++) {
-    await loginAccount(tokens[i], i);
-    await new Promise(resolve => setTimeout(resolve, 5000)); // Delay of 5 seconds between logins
-  }
+    for (let i = 0; i < tokens.length; i++) {
+        await loginAccount(tokens[i], i);
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Delay of 5 seconds between logins
+    }
 })();
